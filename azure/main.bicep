@@ -1,8 +1,9 @@
 // azure/main.bicep
 param location string = resourceGroup().location
 param appName string = 'vitalpath'
-param postgresAdmin string = 'vitaladmin'
+@secure()
 param postgresPassword string
+param postgresAdmin string = 'vitaladmin'
 
 resource plan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: '${appName}-plan'
@@ -27,7 +28,7 @@ resource backend 'Microsoft.Web/sites@2022-09-01' = {
       linuxFxVersion: 'DOCKER|vitalpathregistry.azurecr.io/vitalpath-backend:latest'
       appSettings: [
         { name: 'WEBSITES_PORT', value: '8000' }
-        { name: 'DATABASE_URL', value: 'postgresql://${postgresAdmin}:${postgresPassword}@${appName}-db.postgres.database.azure.com/flexibleserverdb' }
+        { name: 'DATABASE_URL', value: 'postgresql://${postgresAdmin}:${postgresPassword}@${appName}-db-psql.postgres.database.azure.com/flexibleserverdb' }
       ]
     }
   }
@@ -48,32 +49,7 @@ resource frontend 'Microsoft.Web/sites@2022-09-01' = {
   }
 }
 
-resource postgres 'Microsoft.DBforPostgreSQL/flexibleServers@2022-01-20-preview' = {
-  name: '${appName}-db'
-  location: location
-  properties: {
-    administratorLogin: postgresAdmin
-    administratorLoginPassword: postgresPassword
-    version: '14'
-    storage: {
-      storageSizeGB: 32
-    }
-    authentication: {
-      passwordAuthentication: {
-        passwordAuthenticationMethod: 'Enabled'
-      }
-    }
-    highAvailability: {
-      mode: 'Disabled'
-    }
-  }
-  sku: {
-    name: 'Standard_B1ms'
-    tier: 'Burstable'
-    capacity: 1
-    family: 'Gen5'
-  }
-}
+
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: '${appName}-vault'
@@ -100,3 +76,4 @@ resource acr 'Microsoft.ContainerRegistry/registries@2022-02-01-preview' = {
     adminUserEnabled: true
   }
 }
+
