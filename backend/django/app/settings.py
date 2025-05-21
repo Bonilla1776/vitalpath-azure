@@ -7,6 +7,7 @@ from decouple import config
 from pathlib import Path
 from datetime import timedelta
 
+CORS_ALLOW_ALL_ORIGINS = True 
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,17 +28,23 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "users",
+    'consent',
+    'corsheaders',
+    'discovery',
+    'dashboard',
+]
+
 
 
     # Custom apps (to be added)
     # "users",
     # "consent",
     # "discovery",
-]
 
 # MIDDLEWARE
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

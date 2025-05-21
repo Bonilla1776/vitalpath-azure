@@ -1,0 +1,36 @@
+// .github/workflows/deploy.yml
+name: Deploy App Services from ACR
+
+on:
+  workflow_run:
+    workflows: ["Build and Deploy Frontend", "Build and Deploy Backend"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Backend Container to App Service
+        run: |
+          az webapp config container set \
+            --name vitalpath-backend \
+            --resource-group VitalPathRG \
+            --docker-custom-image-name vitalpathregistry.azurecr.io/vitalpath-backend:latest \
+            --docker-registry-server-url https://vitalpathregistry.azurecr.io \
+            --docker-registry-server-user ${{ secrets.ACR_USERNAME }} \
+            --docker-registry-server-password ${{ secrets.ACR_PASSWORD }}
+
+      - name: Deploy Frontend Container to App Service
+        run: |
+          az webapp config container set \
+            --name vitalpath-frontend \
+            --resource-group VitalPathRG \
+            --docker-custom-image-name vitalpathregistry.azurecr.io/vitalpath-frontend:latest \
+            --docker-registry-server-url https://vitalpathregistry.azurecr.io \
+            --docker-registry-server-user ${{ secrets.ACR_USERNAME }} \
+            --docker-registry-server-password ${{ secrets.ACR_PASSWORD }}

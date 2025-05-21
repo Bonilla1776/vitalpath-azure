@@ -1,0 +1,43 @@
+// frontend/app/dashboard/update/page.tsx
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function UpdateProgressPage() {
+  const router = useRouter();
+  const [energy, setEnergy] = useState(50);
+
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("access_token");
+    const res = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ energy }),
+    });
+
+    if (res.ok) router.push("/dashboard");
+  };
+
+  return (
+    <div className="space-y-4 animate-slide-up">
+      <h1 className="text-xl font-bold">Update Energy</h1>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={energy}
+        onChange={(e) => setEnergy(parseInt(e.target.value))}
+        className="w-full"
+      />
+      <p>Value: {energy}</p>
+      <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded shadow">
+        Submit
+      </button>
+    </div>
+  );
+}
+

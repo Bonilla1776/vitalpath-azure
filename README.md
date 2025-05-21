@@ -65,10 +65,10 @@ cd backend/fastapi && uvicorn main:app --reload
 - [x] Superuser account created, admin site reachable
 
 ### 🟩 Milestone 4: User Flow (Register → Consent → Discovery → Dashboard)
-- [ ] Django JWT-based auth via DRF SimpleJWT (`users` app)
-- [ ] POST `/api/consent/` stores IRB agreement (OneToOne with User)
-- [ ] POST `/api/discovery/` stores baseline goals + metrics
-- [ ] Frontend form hooks wired to backend via fetch
+- [x] Scaffolded `users` app with custom user model
+- [x] Installed DRF and SimpleJWT for JWT-based auth
+- [ ] Implemented `POST /api/users/register/`, `login/`, `me/`
+- [ ] Hooked up `/consent/`, `/discovery/` endpoints and frontend forms
 
 ### 🕒 Milestone 5: Infrastructure-as-Code (Azure Bicep)
 - [ ] Setup `/infra/bicep/` directory
@@ -101,4 +101,3 @@ PhD Candidate, Information Science – University of Arkansas at Little Rock
 ---
 
 > "VitalPath is not an app — it’s an intelligent companion guiding you toward your best self."
-
