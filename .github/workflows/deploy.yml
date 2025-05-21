@@ -1,4 +1,4 @@
-// .github/workflows/deploy.yml
+
 name: Deploy App Services from ACR
 
 on:
