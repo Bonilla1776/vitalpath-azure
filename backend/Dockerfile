@@ -5,6 +5,8 @@ WORKDIR /app
 COPY ./backend /app
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-CMD ["gunicorn", "django_project_name.asgi:application", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+# Expose the port Django will run on
+EXPOSE 8000
 
-
+# Run Django ASGI app
+CMD ["gunicorn", "app.asgi:application", "--bind", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker"]
