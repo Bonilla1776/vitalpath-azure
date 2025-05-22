@@ -1,43 +1,541 @@
-// FIXED: frontend/app/dashboard/update/page.tsx
+// frontend/app/dashboard/update/page.tsx - COMPLETE VERSION
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+
+interface DiscoveryData {
+  preferred_name: string;
+  baseline_fulfillment: number;
+  baseline_happiness: number;
+  baseline_energy: number;
+  baseline_stress: number;
+  baseline_sleep: number;
+  baseline_activity: number;
+  baseline_nutrition: number;
+  baseline_purpose: number;
+  baseline_motivation: number;
+  baseline_confidence: number;
+}
 
 export default function UpdateProgressPage() {
   const router = useRouter();
+  
+  // All 10 wellness & purpose indicators
+  const [fulfillment, setFulfillment] = useState(50);
+  const [happiness, setHappiness] = useState(50);
   const [energy, setEnergy] = useState(50);
+  const [stress, setStress] = useState(50);
+  const [sleep, setSleep] = useState(50);
+  const [activity, setActivity] = useState(50);  
+  const [nutrition, setNutrition] = useState(50);
+  const [purpose, setPurpose] = useState(50);
+  const [motivation, setMotivation] = useState(50);
+  const [confidence, setConfidence] = useState(50);
+  
+  const [discoveryData, setDiscoveryData] = useState<DiscoveryData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [fetchingBaseline, setFetchingBaseline] = useState(true);
+
+  // Fetch user's baseline data when component mounts
+  useEffect(() => {
+    const fetchBaseline = async () => {
+      try {
+        const token = localStorage.getItem("access");
+        if (!token) return;
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/discovery/me/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const discovery = await response.json();
+          setDiscoveryData(discovery);
+          
+          // Initialize sliders with baseline values
+          setFulfillment(discovery.baseline_fulfillment || 50);
+          setHappiness(discovery.baseline_happiness || 50);
+          setEnergy(discovery.baseline_energy || 50);
+          setStress(discovery.baseline_stress || 50);
+          setSleep(discovery.baseline_sleep || 50);
+          setActivity(discovery.baseline_activity || 50);
+          setNutrition(discovery.baseline_nutrition || 50);
+          setPurpose(discovery.baseline_purpose || 50);
+          setMotivation(discovery.baseline_motivation || 50);
+          setConfidence(discovery.baseline_confidence || 50);
+        }
+      } catch (err) {
+        console.error("Failed to fetch baseline data:", err);
+      } finally {
+        setFetchingBaseline(false);
+      }
+    };
+
+    fetchBaseline();
+  }, []);
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem("access");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ energy }),
-    });
+    setLoading(true);
+    setError("");
+    
+    try {
+      const token = localStorage.getItem("access");
+      if (!token) {
+        setError("Authentication required");
+        return;
+      }
 
-    if (res.ok) router.push("/dashboard");
+      const progressData = {
+        fulfillment,
+        happiness,
+        energy,
+        stress,
+        sleep,
+        activity,
+        nutrition,
+        purpose,
+        motivation,
+        confidence
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(progressData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Server error: ${response.status}`);
+      }
+
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("Progress update error:", err);
+      setError(err instanceof Error ? err.message : "Failed to update progress");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const getChangeFromBaseline = (current: number, baseline: number) => {
+    const change = current - baseline;
+    return {
+      value: change,
+      isPositive: change > 0,
+      isNeutral: change === 0
+    };
+  };
+
+  if (fetchingBaseline) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-4">Update Your Progress</h1>
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-300 rounded w-3/4 mb-4"></div>
+          <div className="h-64 bg-gray-300 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4 animate-slide-up">
-      <h1 className="text-xl font-bold">Update Energy</h1>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value={energy}
-        onChange={(e) => setEnergy(parseInt(e.target.value))}
-        className="w-full"
-      />
-      <p>Value: {energy}</p>
-      <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded shadow">
-        Submit
-      </button>
+    <div className="max-w-3xl mx-auto p-6 animate-slide-up">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-blue-600 mb-2">
+          Update Your Progress{discoveryData?.preferred_name ? `, ${discoveryData.preferred_name}` : ''}
+        </h1>
+        <p className="text-gray-600">
+          Rate how you feel right now on each indicator (0-100 scale). 
+          Your baseline values are shown for reference.
+        </p>
+      </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-8">
+        {/* Wellness Indicators */}
+        <section className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-6 text-blue-600">Wellness Indicators</h2>
+          
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Fulfillment: {fulfillment}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_fulfillment}
+                    {(() => {
+                      const change = getChangeFromBaseline(fulfillment, discoveryData.baseline_fulfillment);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How fulfilled do you feel in life?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={fulfillment}
+                onChange={(e) => setFulfillment(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Not at all)</span>
+                <span>100 (Completely)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Happiness: {happiness}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_happiness}
+                    {(() => {
+                      const change = getChangeFromBaseline(happiness, discoveryData.baseline_happiness);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How happy do you feel overall?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={happiness}
+                onChange={(e) => setHappiness(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Very unhappy)</span>
+                <span>100 (Very happy)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Energy: {energy}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_energy}
+                    {(() => {
+                      const change = getChangeFromBaseline(energy, discoveryData.baseline_energy);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How energetic are you on most days?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={energy}
+                onChange={(e) => setEnergy(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (No energy)</span>
+                <span>100 (Very energetic)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Stress Management: {stress}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_stress}
+                    {(() => {
+                      const change = getChangeFromBaseline(stress, discoveryData.baseline_stress);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How well do you manage stress?" (higher = better management)</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={stress}
+                onChange={(e) => setStress(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Very stressed)</span>
+                <span>100 (Very calm)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Sleep Quality: {sleep}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_sleep}
+                    {(() => {
+                      const change = getChangeFromBaseline(sleep, discoveryData.baseline_sleep);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How well are you sleeping?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={sleep}
+                onChange={(e) => setSleep(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Very poor)</span>
+                <span>100 (Excellent)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Physical Activity: {activity}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_activity}
+                    {(() => {
+                      const change = getChangeFromBaseline(activity, discoveryData.baseline_activity);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How active are you weekly?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={activity}
+                onChange={(e) => setActivity(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Not active)</span>
+                <span>100 (Very active)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Nutrition Quality: {nutrition}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_nutrition}
+                    {(() => {
+                      const change = getChangeFromBaseline(nutrition, discoveryData.baseline_nutrition);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How healthy is your diet?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={nutrition}
+                onChange={(e) => setNutrition(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Very poor)</span>
+                <span>100 (Excellent)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Purpose Indicators */}
+        <section className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-6 text-blue-600">Purpose Indicators</h2>
+          
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Sense of Purpose: {purpose}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_purpose}
+                    {(() => {
+                      const change = getChangeFromBaseline(purpose, discoveryData.baseline_purpose);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How clear is your life's purpose?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={purpose}
+                onChange={(e) => setPurpose(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Very unclear)</span>
+                <span>100 (Very clear)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Motivation to Change: {motivation}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_motivation}
+                    {(() => {
+                      const change = getChangeFromBaseline(motivation, discoveryData.baseline_motivation);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How motivated are you to make positive changes?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={motivation}
+                onChange={(e) => setMotivation(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Not motivated)</span>
+                <span>100 (Very motivated)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium">
+                  Confidence in Change: {confidence}
+                </label>
+                {discoveryData && (
+                  <span className="text-xs text-gray-500">
+                    Baseline: {discoveryData.baseline_confidence}
+                    {(() => {
+                      const change = getChangeFromBaseline(confidence, discoveryData.baseline_confidence);
+                      return change.isNeutral ? '' : (
+                        <span className={change.isPositive ? 'text-green-600' : 'text-red-600'}>
+                          {' '}({change.isPositive ? '+' : ''}{change.value})
+                        </span>
+                      );
+                    })()}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mb-2">"How confident are you that you can create the future-self you desire?"</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={confidence}
+                onChange={(e) => setConfidence(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 (Not confident)</span>
+                <span>100 (Very confident)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Action Buttons */}
+        <div className="flex space-x-4 pt-6">
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          >
+            {loading ? "Updating Progress..." : "Save Progress Update"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
-
