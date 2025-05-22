@@ -20,8 +20,3 @@ urlpatterns = [
     path("api/discovery/", include("discovery.urls")),
     path("api/dashboard/", include("dashboard.urls")),
 ]
-
-
-
-
-]
