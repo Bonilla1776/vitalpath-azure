@@ -1,9 +1,8 @@
 FROM node:20-alpine
 WORKDIR /app
 
-COPY ./frontend /app
+COPY . .
 
-# Set env variable directly
 ENV NEXT_PUBLIC_API_URL=https://vitalpath-backend.azurewebsites.net
 
 RUN npm install && npm run build
