@@ -1,4 +1,3 @@
-// frontend/app/consent/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -8,13 +7,13 @@ export default function ConsentPage() {
 
   const handleAgree = async () => {
     const token = localStorage.getItem("access_token");
-    await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/consent/", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/consent/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ agreed: true }),
+      body: JSON.stringify({ accepted: true }), // Fixed: changed 'agreed' to 'accepted'
     });
     router.push("/discovery");
   };

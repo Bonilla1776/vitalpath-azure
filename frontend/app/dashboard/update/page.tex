@@ -1,4 +1,4 @@
-// frontend/app/dashboard/update/page.tsx
+// FIXED: frontend/app/dashboard/update/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -9,8 +9,8 @@ export default function UpdateProgressPage() {
   const [energy, setEnergy] = useState(50);
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem("access_token");
-    const res = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/", {
+    const token = localStorage.getItem("access");
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

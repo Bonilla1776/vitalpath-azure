@@ -7,7 +7,7 @@ param postgresAdmin string = 'vitaladmin'
 
 // Add PostgreSQL Flexible Server
 resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' = {
-  name: '${appName}-db-psql'
+  name: '${appName}-db'
   location: location
   sku: {
     name: 'Standard_B1ms'
