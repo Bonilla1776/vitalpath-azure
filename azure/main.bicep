@@ -49,8 +49,6 @@ resource frontend 'Microsoft.Web/sites@2022-09-01' = {
   }
 }
 
-
-
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: '${appName}-vault'
   location: location
