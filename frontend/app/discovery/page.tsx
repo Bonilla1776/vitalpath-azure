@@ -1,4 +1,4 @@
-// frontend/app/discovery/page.tsx - ESLINT FIXED VERSION
+// frontend/app/discovery/page.tsx - COMPLETE UPDATED VERSION
 "use client";
 
 import { useState } from "react";
@@ -68,19 +68,19 @@ export default function DiscoveryPage() {
       // Prepare discovery data
       const discoveryData = {
         // Basic Information
-        preferred_name: preferredName,
+        preferred_name: preferredName.trim(),
         age: age,
         gender: gender,
         height_feet: heightFeet,
         height_inches: heightInches,
         weight: weight,
-        location: location,
-        marital_status: maritalStatus,
+        location: location.trim(),
+        marital_status: maritalStatus || "",
         
         // Health Goals (use custom if provided, otherwise use selected)
-        goal_1: customGoal1 || goal1,
-        goal_2: customGoal2 || goal2,
-        goal_3: customGoal3 || goal3,
+        goal_1: (customGoal1 || goal1).trim(),
+        goal_2: (customGoal2 || goal2).trim(),
+        goal_3: (customGoal3 || goal3).trim(),
         
         // Wellness & Purpose Indicators (baseline)
         baseline_fulfillment: fulfillment,
@@ -95,6 +95,8 @@ export default function DiscoveryPage() {
         baseline_confidence: confidence
       };
 
+      console.log("Submitting discovery data:", discoveryData); // Debug log
+
       // Submit discovery data
       const discoveryResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/discovery/`, {
         method: "POST",
@@ -105,10 +107,24 @@ export default function DiscoveryPage() {
         body: JSON.stringify(discoveryData),
       });
 
+      console.log("Discovery response status:", discoveryResponse.status); // Debug log
+
       if (!discoveryResponse.ok) {
-        const errorData = await discoveryResponse.json().catch(() => ({}));
+        const errorText = await discoveryResponse.text();
+        console.error("Discovery error response:", errorText); // Debug log
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { detail: `Server error: ${discoveryResponse.status}` };
+        }
+        
         throw new Error(errorData.detail || `Discovery submission failed: ${discoveryResponse.status}`);
       }
+
+      const discoveryResult = await discoveryResponse.json();
+      console.log("Discovery success:", discoveryResult); // Debug log
 
       // Create initial dashboard entry with baseline data
       const dashboardResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/`, {
@@ -138,7 +154,7 @@ export default function DiscoveryPage() {
       router.push("/dashboard");
     } catch (err) {
       console.error("Discovery submission error:", err);
-      setError(err instanceof Error ? err.message : "Failed to submit discovery data");
+      setError(`Submission failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -157,10 +173,10 @@ export default function DiscoveryPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 animate-slide-up">
+    <div className="max-w-4xl mx-auto p-6 animate-slide-up">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-blue-600 mb-2">Welcome to Your Health Journey!</h1>
-        <p className="text-gray-600 leading-relaxed">
+        <p className="text-gray-600 leading-relaxed max-w-2xl mx-auto">
           We&rsquo;re excited you&rsquo;re here. Before we get started, we&rsquo;d like to learn a bit about you. 
           Your honest answers will help us tailor our coaching and ensure you get the support you need. Let&rsquo;s begin!
         </p>
@@ -168,34 +184,54 @@ export default function DiscoveryPage() {
 
       {/* Progress Indicator */}
       <div className="flex justify-center mb-8">
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-4">
           {[1, 2, 3].map((section) => (
-            <div
-              key={section}
-              className={`w-3 h-3 rounded-full ${
-                section <= currentSection ? 'bg-blue-600' : 'bg-gray-300'
-              }`}
-            />
+            <div key={section} className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                  section <= currentSection 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-300 text-gray-600'
+                }`}
+              >
+                {section}
+              </div>
+              {section < 3 && (
+                <div className={`w-12 h-1 mx-2 ${
+                  section < currentSection ? 'bg-blue-600' : 'bg-gray-300'
+                }`} />
+              )}
+            </div>
           ))}
+        </div>
+      </div>
+
+      <div className="text-center mb-6">
+        <div className="text-sm text-gray-500">
+          Step {currentSection} of 3: {
+            currentSection === 1 ? 'Basic Information' : 
+            currentSection === 2 ? 'Health Goals' : 
+            'Wellness Assessment'
+          }
         </div>
       </div>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          {error}
+          <strong>Error:</strong> {error}
         </div>
       )}
 
       {/* Part 1: Basic Information */}
       {currentSection === 1 && (
-        <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center mb-6">Part 1: Basic Information</h2>
+        <section className="bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-2xl font-semibold text-center mb-8 text-blue-600">Part 1: Basic Information</h2>
           
-          <div className="space-y-4">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium mb-2">Preferred Name *</label>
               <input
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 type="text"
                 placeholder="What would you like us to call you?"
                 value={preferredName}
@@ -212,7 +248,7 @@ export default function DiscoveryPage() {
                 max="100"
                 value={age}
                 onChange={(e) => setAge(parseInt(e.target.value))}
-                className="w-full"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
               <div className="flex justify-between text-xs text-gray-500 mt-1">
                 <span>18</span>
@@ -223,7 +259,7 @@ export default function DiscoveryPage() {
             <div>
               <label className="block text-sm font-medium mb-2">Gender *</label>
               <select
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 required
@@ -238,40 +274,35 @@ export default function DiscoveryPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Height: {heightFeet}&apos; {heightInches}&quot; *
+                Height: {heightFeet}&apos;{heightInches}&quot; *
               </label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500">Feet</label>
+                  <label className="text-xs text-gray-500 block mb-1">Feet</label>
                   <input
-                    type="range"
+                    type="number"
                     min="3"
                     max="7"
                     value={heightFeet}
-                    onChange={(e) => setHeightFeet(parseInt(e.target.value))}
-                    className="w-full"
+                    onChange={(e) => setHeightFeet(parseInt(e.target.value) || 5)}
+                    className="w-full p-3 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="5"
                   />
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>3&apos;</span>
-                    <span>7&apos;</span>
-                  </div>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500">Inches</label>
+                  <label className="text-xs text-gray-500 block mb-1">Inches</label>
                   <input
-                    type="range"
+                    type="number"
                     min="0"
                     max="11"
                     value={heightInches}
-                    onChange={(e) => setHeightInches(parseInt(e.target.value))}
-                    className="w-full"
+                    onChange={(e) => setHeightInches(parseInt(e.target.value) || 6)}
+                    className="w-full p-3 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="6"
                   />
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>0&quot;</span>
-                    <span>11&quot;</span>
-                  </div>
                 </div>
               </div>
+              <p className="text-xs text-gray-500 mt-1">Enter whole numbers only</p>
             </div>
 
             <div>
@@ -282,7 +313,7 @@ export default function DiscoveryPage() {
                 max="425"
                 value={weight}
                 onChange={(e) => setWeight(parseInt(e.target.value))}
-                className="w-full"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
               <div className="flex justify-between text-xs text-gray-500 mt-1">
                 <span>70 lbs</span>
@@ -290,10 +321,10 @@ export default function DiscoveryPage() {
               </div>
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium mb-2">Location (Zip Code or City) *</label>
               <input
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 type="text"
                 placeholder="e.g., 72205 or Little Rock, AR"
                 value={location}
@@ -302,10 +333,10 @@ export default function DiscoveryPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Marital Status</label>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium mb-2">Marital Status (Optional)</label>
               <select
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={maritalStatus}
                 onChange={(e) => setMaritalStatus(e.target.value)}
               >
@@ -321,30 +352,32 @@ export default function DiscoveryPage() {
             </div>
           </div>
 
-          <button
-            onClick={nextSection}
-            disabled={!preferredName || !gender || !location}
-            className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Continue to Health Goals
-          </button>
+          <div className="mt-8">
+            <button
+              onClick={nextSection}
+              disabled={!preferredName || !gender || !location}
+              className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
+            >
+              Continue to Health Goals →
+            </button>
+          </div>
         </section>
       )}
 
       {/* Part 2: Health Goals */}
       {currentSection === 2 && (
-        <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center mb-6">Part 2: Top Three Health Goals</h2>
-          <p className="text-center text-gray-600 mb-6">
+        <section className="bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-2xl font-semibold text-center mb-4 text-blue-600">Part 2: Top Three Health Goals</h2>
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
             Select and rank your top three health goals (1, 2, 3). You can also write in your own if it&rsquo;s not listed.
           </p>
 
           <div className="space-y-6">
             {/* Goal 1 */}
-            <div className="border rounded-lg p-4">
-              <h3 className="font-semibold mb-3 text-blue-600">Goal #1 (Most Important) *</h3>
+            <div className="border-2 border-blue-200 rounded-lg p-6 bg-blue-50">
+              <h3 className="font-semibold mb-4 text-blue-700 text-lg">🥇 Goal #1 (Most Important) *</h3>
               <select
-                className="w-full p-3 border rounded-lg mb-3"
+                className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={goal1}
                 onChange={(e) => setGoal1(e.target.value)}
               >
@@ -356,7 +389,7 @@ export default function DiscoveryPage() {
               </select>
               {goal1 === "other" && (
                 <input
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   type="text"
                   placeholder="Describe your custom goal"
                   value={customGoal1}
@@ -366,10 +399,10 @@ export default function DiscoveryPage() {
             </div>
 
             {/* Goal 2 */}
-            <div className="border rounded-lg p-4">
-              <h3 className="font-semibold mb-3 text-blue-600">Goal #2 (Second Priority)</h3>
+            <div className="border-2 border-gray-200 rounded-lg p-6">
+              <h3 className="font-semibold mb-4 text-gray-700 text-lg">🥈 Goal #2 (Second Priority)</h3>
               <select
-                className="w-full p-3 border rounded-lg mb-3"
+                className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={goal2}
                 onChange={(e) => setGoal2(e.target.value)}
               >
@@ -381,7 +414,7 @@ export default function DiscoveryPage() {
               </select>
               {goal2 === "other" && (
                 <input
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   type="text"
                   placeholder="Describe your custom goal"
                   value={customGoal2}
@@ -391,10 +424,10 @@ export default function DiscoveryPage() {
             </div>
 
             {/* Goal 3 */}
-            <div className="border rounded-lg p-4">
-              <h3 className="font-semibold mb-3 text-blue-600">Goal #3 (Third Priority)</h3>
+            <div className="border-2 border-gray-200 rounded-lg p-6">
+              <h3 className="font-semibold mb-4 text-gray-700 text-lg">🥉 Goal #3 (Third Priority)</h3>
               <select
-                className="w-full p-3 border rounded-lg mb-3"
+                className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={goal3}
                 onChange={(e) => setGoal3(e.target.value)}
               >
@@ -406,7 +439,7 @@ export default function DiscoveryPage() {
               </select>
               {goal3 === "other" && (
                 <input
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   type="text"
                   placeholder="Describe your custom goal"
                   value={customGoal3}
@@ -416,19 +449,19 @@ export default function DiscoveryPage() {
             </div>
           </div>
 
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 mt-8">
             <button
               onClick={prevSection}
-              className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50"
+              className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 font-medium"
             >
-              Back
+              ← Back
             </button>
             <button
               onClick={nextSection}
               disabled={!goal1 && !customGoal1}
-              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
-              Continue to Wellness Assessment
+              Continue to Wellness Assessment →
             </button>
           </div>
         </section>
@@ -436,179 +469,236 @@ export default function DiscoveryPage() {
 
       {/* Part 3: Wellness & Purpose Indicators */}
       {currentSection === 3 && (
-        <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center mb-6">Part 3: Wellness &amp; Purpose</h2>
-          <p className="text-center text-gray-600 mb-6">
-            Rate how you feel right now on a scale from 0 (lowest) to 100 (highest).
+        <section className="bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-2xl font-semibold text-center mb-4 text-blue-600">Part 3: Wellness &amp; Purpose</h2>
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+            Rate how you feel right now on a scale from 0 (lowest) to 100 (highest). This will be your baseline for tracking progress.
           </p>
 
-          <div className="space-y-6">
-            <div className="border-b pb-4">
-              <h3 className="text-lg font-semibold mb-4 text-blue-600">Wellness Indicators</h3>
+          <div className="space-y-8">
+            <div className="border-b border-gray-200 pb-6">
+              <h3 className="text-xl font-semibold mb-6 text-blue-600">💪 Wellness Indicators</h3>
               
-              <div className="space-y-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gray-50 p-4 rounded-lg">
                   <label className="block text-sm font-medium mb-2">
-                    Fulfillment: {fulfillment} - &ldquo;How fulfilled do you feel in life?&rdquo;
+                    Fulfillment: <span className="text-blue-600 font-bold">{fulfillment}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How fulfilled do you feel in life?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={fulfillment}
                     onChange={(e) => setFulfillment(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Not at all)</span>
+                    <span>100 (Completely)</span>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-gray-50 p-4 rounded-lg">
                   <label className="block text-sm font-medium mb-2">
-                    Happiness: {happiness} - &ldquo;How happy do you feel overall?&rdquo;
+                    Happiness: <span className="text-blue-600 font-bold">{happiness}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How happy do you feel overall?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={happiness}
                     onChange={(e) => setHappiness(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Very unhappy)</span>
+                    <span>100 (Very happy)</span>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-gray-50 p-4 rounded-lg">
                   <label className="block text-sm font-medium mb-2">
-                    Energy: {energy} - &ldquo;How energetic are you on most days?&rdquo;
+                    Energy: <span className="text-blue-600 font-bold">{energy}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How energetic are you on most days?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={energy}
                     onChange={(e) => setEnergy(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (No energy)</span>
+                    <span>100 (Very energetic)</span>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-gray-50 p-4 rounded-lg">
                   <label className="block text-sm font-medium mb-2">
-                    Stress Management: {stress} - &ldquo;How well do you manage stress?&rdquo; (higher = better)
+                    Stress Management: <span className="text-blue-600 font-bold">{stress}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How well do you manage stress?&rdquo; (higher = better)</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={stress}
                     onChange={(e) => setStress(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Very stressed)</span>
+                    <span>100 (Very calm)</span>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-gray-50 p-4 rounded-lg">
                   <label className="block text-sm font-medium mb-2">
-                    Sleep Quality: {sleep} - &ldquo;How well are you sleeping?&rdquo;
+                    Sleep Quality: <span className="text-blue-600 font-bold">{sleep}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How well are you sleeping?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={sleep}
                     onChange={(e) => setSleep(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Very poor)</span>
+                    <span>100 (Excellent)</span>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-gray-50 p-4 rounded-lg">
                   <label className="block text-sm font-medium mb-2">
-                    Physical Activity: {activity} - &ldquo;How active are you weekly?&rdquo;
+                    Physical Activity: <span className="text-blue-600 font-bold">{activity}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How active are you weekly?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={activity}
                     onChange={(e) => setActivity(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Not active)</span>
+                    <span>100 (Very active)</span>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-gray-50 p-4 rounded-lg md:col-span-2">
                   <label className="block text-sm font-medium mb-2">
-                    Nutrition Quality: {nutrition} - &ldquo;How healthy is your diet?&rdquo;
+                    Nutrition Quality: <span className="text-blue-600 font-bold">{nutrition}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How healthy is your diet?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={nutrition}
                     onChange={(e) => setNutrition(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Very poor)</span>
+                    <span>100 (Excellent)</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-blue-600">Purpose Indicators</h3>
+              <h3 className="text-xl font-semibold mb-6 text-blue-600">🎯 Purpose Indicators</h3>
               
-              <div className="space-y-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-blue-50 p-4 rounded-lg">
                   <label className="block text-sm font-medium mb-2">
-                    Sense of Purpose: {purpose} - &ldquo;How clear is your life&rsquo;s purpose?&rdquo;
+                    Sense of Purpose: <span className="text-blue-600 font-bold">{purpose}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How clear is your life&rsquo;s purpose?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={purpose}
                     onChange={(e) => setPurpose(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Very unclear)</span>
+                    <span>100 (Very clear)</span>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-blue-50 p-4 rounded-lg">
                   <label className="block text-sm font-medium mb-2">
-                    Motivation to Change: {motivation} - &ldquo;How motivated are you to make positive changes?&rdquo;
+                    Motivation to Change: <span className="text-blue-600 font-bold">{motivation}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How motivated are you to make positive changes?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={motivation}
                     onChange={(e) => setMotivation(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Not motivated)</span>
+                    <span>100 (Very motivated)</span>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-blue-50 p-4 rounded-lg md:col-span-2">
                   <label className="block text-sm font-medium mb-2">
-                    Confidence in Change: {confidence} - &ldquo;How confident are you that you can create the future-self you desire?&rdquo;
+                    Confidence in Change: <span className="text-blue-600 font-bold">{confidence}</span>
                   </label>
+                  <p className="text-xs text-gray-600 mb-3">&ldquo;How confident are you that you can create the future-self you desire?&rdquo;</p>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={confidence}
                     onChange={(e) => setConfidence(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0 (Not confident)</span>
+                    <span>100 (Very confident)</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 mt-8">
             <button
               onClick={prevSection}
-              className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50"
+              className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 font-medium"
             >
-              Back
+              ← Back
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading || !isFormValid()}
-              className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
             >
-              {loading ? "Creating Your Dashboard..." : "Complete Setup"}
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Creating Your Dashboard...
+                </div>
+              ) : (
+                "Complete Setup & Go to Dashboard 🚀"
+              )}
             </button>
           </div>
         </section>
