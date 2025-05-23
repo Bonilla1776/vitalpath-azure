@@ -1,4 +1,4 @@
-# users/views.py
+# backend/django/users/views.py - UPDATED WITH STANDARD JWT
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
@@ -11,6 +11,10 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = []  # No authentication required for registration
 
 class LoginView(APIView):
+    """
+    Custom login view that returns JWT tokens
+    Note: You can also use the standard TokenObtainPairView at /api/token/
+    """
     permission_classes = []  # No authentication required for login
     
     def post(self, request):
@@ -29,6 +33,11 @@ class LoginView(APIView):
             return Response({
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "preferred_name": getattr(user, 'preferred_name', user.email.split('@')[0])
+                }
             })
         return Response(
             {"detail": "Invalid credentials."}, 
