@@ -1,20 +1,20 @@
-// frontend/app/discovery/page.tsx - COMPLETE PREMIUM UI/UX VERSION ✨
+// frontend/app/discovery/page.tsx - COMPLETE ACTUALLY PREMIUM VERSION ✨
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const predefinedGoals = [
-  { id: "longevity", label: "Longevity", icon: "🌟", color: "from-purple-500 to-pink-500" },
-  { id: "stress", label: "Stress reduction", icon: "🧘", color: "from-blue-500 to-cyan-500" },
-  { id: "weight", label: "Weight management", icon: "⚖️", color: "from-green-500 to-emerald-500" },
-  { id: "sleep", label: "Better sleep quality", icon: "😴", color: "from-indigo-500 to-purple-500" },
-  { id: "strength", label: "Build strength and muscle", icon: "💪", color: "from-red-500 to-orange-500" },
-  { id: "energy", label: "Increase daily energy", icon: "⚡", color: "from-yellow-500 to-orange-500" },
-  { id: "nutrition", label: "Healthier nutrition", icon: "🥗", color: "from-green-400 to-lime-500" },
-  { id: "mental", label: "Improve mental health", icon: "🧠", color: "from-teal-500 to-cyan-500" },
-  { id: "cardio", label: "Boost cardiovascular fitness", icon: "❤️", color: "from-pink-500 to-red-500" },
-  { id: "hobbies", label: "Explore new activities", icon: "🎨", color: "from-violet-500 to-purple-500" }
+  { id: "longevity", label: "Longevity", icon: "🌟", gradient: "bg-gradient-to-br from-purple-600 to-pink-600" },
+  { id: "stress", label: "Stress reduction", icon: "🧘", gradient: "bg-gradient-to-br from-blue-600 to-cyan-600" },
+  { id: "weight", label: "Weight management", icon: "⚖️", gradient: "bg-gradient-to-br from-green-600 to-emerald-600" },
+  { id: "sleep", label: "Better sleep quality", icon: "😴", gradient: "bg-gradient-to-br from-indigo-600 to-purple-600" },
+  { id: "strength", label: "Build strength and muscle", icon: "💪", gradient: "bg-gradient-to-br from-red-600 to-orange-600" },
+  { id: "energy", label: "Increase daily energy", icon: "⚡", gradient: "bg-gradient-to-br from-yellow-500 to-orange-600" },
+  { id: "nutrition", label: "Healthier nutrition", icon: "🥗", gradient: "bg-gradient-to-br from-green-500 to-lime-600" },
+  { id: "mental", label: "Improve mental health", icon: "🧠", gradient: "bg-gradient-to-br from-teal-600 to-cyan-600" },
+  { id: "cardio", label: "Boost cardiovascular fitness", icon: "❤️", gradient: "bg-gradient-to-br from-pink-600 to-red-600" },
+  { id: "hobbies", label: "Explore new activities", icon: "🎨", gradient: "bg-gradient-to-br from-violet-600 to-purple-600" }
 ];
 
 export default function DiscoveryPage() {
@@ -36,7 +36,6 @@ export default function DiscoveryPage() {
   
   // Part 2: Health Goals
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-  const [customGoals, setCustomGoals] = useState<{[key: string]: string}>({});
   
   // Part 3: Wellness & Purpose Indicators (0-100 scale)
   const [indicators, setIndicators] = useState({
@@ -61,8 +60,8 @@ export default function DiscoveryPage() {
   }, []);
 
   // 🪄 AUTO-REFRESH MAGIC - Automatically refreshes expired tokens
-  const makeAuthRequest = async (url: string, options: any) => {
-    let token = localStorage.getItem("access");
+  const makeAuthRequest = async (url: string, options: RequestInit) => {
+    const token = localStorage.getItem("access");
     
     if (!token) {
       throw new Error("Please login to continue");
@@ -148,9 +147,9 @@ export default function DiscoveryPage() {
         weight: weight,
         location: location.trim(),
         marital_status: maritalStatus || "",
-        goal_1: selectedGoals[0] ? (customGoals[selectedGoals[0]] || selectedGoals[0]) : "",
-        goal_2: selectedGoals[1] ? (customGoals[selectedGoals[1]] || selectedGoals[1]) : "",
-        goal_3: selectedGoals[2] ? (customGoals[selectedGoals[2]] || selectedGoals[2]) : "",
+        goal_1: selectedGoals[0] || "",
+        goal_2: selectedGoals[1] || "",
+        goal_3: selectedGoals[2] || "",
         baseline_fulfillment: indicators.fulfillment,
         baseline_happiness: indicators.happiness,
         baseline_energy: indicators.energy,
@@ -273,23 +272,24 @@ export default function DiscoveryPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 right-0 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 relative">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-600 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-2000"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-600 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-4000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-pulse"></div>
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
         {/* Hero Section */}
-        <div className={`text-center mb-12 transform transition-all duration-1000 ${
+        <div className={`text-center mb-16 transform transition-all duration-1000 ${
           mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
         }`}>
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full mb-6 animate-pulse">
-            <span className="text-3xl">🚀</span>
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full mb-8 shadow-2xl animate-bounce">
+            <span className="text-4xl">🚀</span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 drop-shadow-2xl">
             Welcome to Your Journey
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
@@ -299,30 +299,30 @@ export default function DiscoveryPage() {
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-12">
+        <div className="mb-16">
           <div className="flex items-center justify-center space-x-8">
             {[1, 2, 3].map((section) => (
               <div key={section} className="flex items-center">
-                <div className={`relative w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-500 ${
+                <div className={`relative w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold transition-all duration-500 shadow-2xl ${
                   section <= currentSection 
-                    ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg scale-110' 
-                    : 'bg-gray-700 text-gray-400'
+                    ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white scale-110 animate-pulse' 
+                    : 'bg-gray-800 text-gray-400 border-2 border-gray-600'
                 }`}>
                   {section < currentSection ? '✓' : section}
                   {section <= currentSection && (
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 animate-ping opacity-75"></div>
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 animate-ping opacity-30"></div>
                   )}
                 </div>
                 {section < 3 && (
-                  <div className={`w-24 h-1 mx-4 rounded-full transition-all duration-500 ${
+                  <div className={`w-32 h-2 mx-6 rounded-full transition-all duration-500 ${
                     section < currentSection ? 'bg-gradient-to-r from-cyan-500 to-purple-500' : 'bg-gray-700'
                   }`} />
                 )}
               </div>
             ))}
           </div>
-          <div className="text-center mt-4">
-            <span className="text-gray-400 text-sm">
+          <div className="text-center mt-6">
+            <span className="text-gray-300 text-lg font-medium bg-gray-800/50 px-6 py-2 rounded-full backdrop-blur-sm">
               Step {currentSection} of 3: {
                 currentSection === 1 ? '✨ About You' : 
                 currentSection === 2 ? '🎯 Your Goals' : 
@@ -333,12 +333,12 @@ export default function DiscoveryPage() {
         </div>
 
         {error && (
-          <div className="max-w-2xl mx-auto mb-8 p-4 bg-red-500/20 border border-red-500/50 rounded-xl backdrop-blur-sm">
+          <div className="max-w-2xl mx-auto mb-8 p-6 bg-red-500/20 border-2 border-red-500/50 rounded-2xl backdrop-blur-sm shadow-2xl">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">⚠️</span>
+              <span className="text-3xl mr-4">⚠️</span>
               <div>
-                <p className="text-red-300 font-medium">Oops! Something went wrong</p>
-                <p className="text-red-200 text-sm">{error}</p>
+                <p className="text-red-300 font-bold text-lg">Oops! Something went wrong</p>
+                <p className="text-red-200">{error}</p>
               </div>
             </div>
           </div>
@@ -351,21 +351,21 @@ export default function DiscoveryPage() {
           
           {/* Part 1: Basic Information */}
           {currentSection === 1 && (
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl">
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl mb-4">
-                    <span className="text-2xl">👋</span>
+            <div className="max-w-5xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-16 border border-white/30 shadow-2xl">
+                <div className="text-center mb-12">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl mb-6 shadow-2xl">
+                    <span className="text-3xl">👋</span>
                   </div>
-                  <h2 className="text-3xl font-bold text-white mb-2">Let&rsquo;s Get to Know You</h2>
-                  <p className="text-gray-300">Tell us a bit about yourself to personalize your experience</p>
+                  <h2 className="text-4xl font-bold text-white mb-4">Let&rsquo;s Get to Know You</h2>
+                  <p className="text-gray-300 text-lg">Tell us a bit about yourself to personalize your experience</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="md:col-span-2">
-                    <label className="block text-white font-medium mb-3">What should we call you? ✨</label>
+                    <label className="block text-white font-semibold mb-4 text-lg">What should we call you? ✨</label>
                     <input
-                      className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:bg-white/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300"
+                      className="w-full p-6 bg-white/10 border-2 border-white/30 rounded-2xl text-white text-lg placeholder-gray-400 focus:bg-white/20 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/30 transition-all duration-300 shadow-lg"
                       type="text"
                       placeholder="Your preferred name..."
                       value={preferredName}
@@ -374,24 +374,27 @@ export default function DiscoveryPage() {
                   </div>
 
                   <div>
-                    <label className="block text-white font-medium mb-3">Your Age: <span className="text-cyan-400 font-bold">{age}</span></label>
+                    <label className="block text-white font-semibold mb-4 text-lg">Your Age: <span className="text-cyan-400 font-bold text-2xl">{age}</span></label>
                     <input
                       type="range"
                       min="18"
                       max="100"
                       value={age}
                       onChange={(e) => setAge(parseInt(e.target.value))}
-                      className="w-full h-3 bg-white/20 rounded-full appearance-none cursor-pointer slider-thumb"
+                      className="w-full h-4 bg-gradient-to-r from-gray-700 to-gray-600 rounded-full appearance-none cursor-pointer slider-thumb"
+                      style={{
+                        background: `linear-gradient(to right, #06b6d4 0%, #8b5cf6 ${(age-18)/(100-18)*100}%, #374151 ${(age-18)/(100-18)*100}%, #374151 100%)`
+                      }}
                     />
-                    <div className="flex justify-between text-xs text-gray-400 mt-2">
+                    <div className="flex justify-between text-sm text-gray-400 mt-2">
                       <span>18</span>
                       <span>100</span>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-medium mb-3">Gender</label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <label className="block text-white font-semibold mb-4 text-lg">Gender</label>
+                    <div className="grid grid-cols-2 gap-4">
                       {[
                         { value: "male", label: "Male", icon: "👨" },
                         { value: "female", label: "Female", icon: "👩" },
@@ -401,13 +404,13 @@ export default function DiscoveryPage() {
                         <button
                           key={option.value}
                           onClick={() => setGender(option.value)}
-                          className={`p-3 rounded-xl border transition-all duration-300 ${
+                          className={`p-4 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
                             gender === option.value
-                              ? 'bg-gradient-to-r from-cyan-500 to-purple-500 border-cyan-500 text-white shadow-lg scale-105'
-                              : 'bg-white/10 border-white/20 text-gray-300 hover:bg-white/20 hover:border-white/40'
+                              ? 'bg-gradient-to-r from-cyan-500 to-purple-500 border-cyan-400 text-white shadow-2xl scale-105'
+                              : 'bg-white/10 border-white/30 text-gray-300 hover:bg-white/20 hover:border-white/50'
                           }`}
                         >
-                          <div className="text-lg mb-1">{option.icon}</div>
+                          <div className="text-2xl mb-2">{option.icon}</div>
                           <div className="text-sm font-medium">{option.label}</div>
                         </button>
                       ))}
@@ -415,55 +418,58 @@ export default function DiscoveryPage() {
                   </div>
 
                   <div>
-                    <label className="block text-white font-medium mb-3">
-                      Height: <span className="text-cyan-400 font-bold">{heightFeet}&apos;{heightInches}&quot;</span>
+                    <label className="block text-white font-semibold mb-4 text-lg">
+                      Height: <span className="text-cyan-400 font-bold text-xl">{heightFeet}&apos;{heightInches}&quot;</span>
                     </label>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs text-gray-400 block mb-2">Feet</label>
+                        <label className="text-sm text-gray-400 block mb-2">Feet</label>
                         <input
                           type="number"
                           min="3"
                           max="7"
                           value={heightFeet}
                           onChange={(e) => setHeightFeet(parseInt(e.target.value) || 5)}
-                          className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white text-center focus:bg-white/20 focus:border-cyan-500 transition-all duration-300"
+                          className="w-full p-4 bg-white/10 border-2 border-white/30 rounded-xl text-white text-center text-xl focus:bg-white/20 focus:border-cyan-400 transition-all duration-300 shadow-lg"
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-gray-400 block mb-2">Inches</label>
+                        <label className="text-sm text-gray-400 block mb-2">Inches</label>
                         <input
                           type="number"
                           min="0"
                           max="11"
                           value={heightInches}
                           onChange={(e) => setHeightInches(parseInt(e.target.value) || 6)}
-                          className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white text-center focus:bg-white/20 focus:border-cyan-500 transition-all duration-300"
+                          className="w-full p-4 bg-white/10 border-2 border-white/30 rounded-xl text-white text-center text-xl focus:bg-white/20 focus:border-cyan-400 transition-all duration-300 shadow-lg"
                         />
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-medium mb-3">Weight: <span className="text-cyan-400 font-bold">{weight} lbs</span></label>
+                    <label className="block text-white font-semibold mb-4 text-lg">Weight: <span className="text-cyan-400 font-bold text-2xl">{weight} lbs</span></label>
                     <input
                       type="range"
                       min="70"
                       max="425"
                       value={weight}
                       onChange={(e) => setWeight(parseInt(e.target.value))}
-                      className="w-full h-3 bg-white/20 rounded-full appearance-none cursor-pointer slider-thumb"
+                      className="w-full h-4 bg-gradient-to-r from-gray-700 to-gray-600 rounded-full appearance-none cursor-pointer slider-thumb"
+                      style={{
+                        background: `linear-gradient(to right, #06b6d4 0%, #8b5cf6 ${(weight-70)/(425-70)*100}%, #374151 ${(weight-70)/(425-70)*100}%, #374151 100%)`
+                      }}
                     />
-                    <div className="flex justify-between text-xs text-gray-400 mt-2">
+                    <div className="flex justify-between text-sm text-gray-400 mt-2">
                       <span>70 lbs</span>
                       <span>425 lbs</span>
                     </div>
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-white font-medium mb-3">Where are you located? 📍</label>
+                    <label className="block text-white font-semibold mb-4 text-lg">Where are you located? 📍</label>
                     <input
-                      className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:bg-white/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300"
+                      className="w-full p-6 bg-white/10 border-2 border-white/30 rounded-2xl text-white text-lg placeholder-gray-400 focus:bg-white/20 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/30 transition-all duration-300 shadow-lg"
                       type="text"
                       placeholder="City, State or Zip Code..."
                       value={location}
@@ -472,8 +478,8 @@ export default function DiscoveryPage() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-white font-medium mb-3">Relationship Status (Optional) 💕</label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <label className="block text-white font-semibold mb-4 text-lg">Relationship Status (Optional) 💕</label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {[
                         { value: "single", label: "Single" },
                         { value: "married", label: "Married" },
@@ -483,10 +489,10 @@ export default function DiscoveryPage() {
                         <button
                           key={option.value}
                           onClick={() => setMaritalStatus(maritalStatus === option.value ? "" : option.value)}
-                          className={`p-3 rounded-xl border transition-all duration-300 ${
+                          className={`p-4 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
                             maritalStatus === option.value
-                              ? 'bg-gradient-to-r from-pink-500 to-purple-500 border-pink-500 text-white shadow-lg'
-                              : 'bg-white/10 border-white/20 text-gray-300 hover:bg-white/20'
+                              ? 'bg-gradient-to-r from-pink-500 to-purple-500 border-pink-400 text-white shadow-2xl'
+                              : 'bg-white/10 border-white/30 text-gray-300 hover:bg-white/20'
                           }`}
                         >
                           <div className="text-sm font-medium">{option.label}</div>
@@ -496,11 +502,11 @@ export default function DiscoveryPage() {
                   </div>
                 </div>
 
-                <div className="mt-12">
+                <div className="mt-16">
                   <button
                     onClick={nextSection}
                     disabled={!preferredName || !gender || !location}
-                    className="w-full py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-lg rounded-2xl hover:from-cyan-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 shadow-2xl"
+                    className="w-full py-6 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-xl rounded-2xl hover:from-cyan-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 shadow-2xl"
                   >
                     Continue to Goals 🎯
                   </button>
@@ -511,17 +517,17 @@ export default function DiscoveryPage() {
 
           {/* Part 2: Health Goals */}
           {currentSection === 2 && (
-            <div className="max-w-6xl mx-auto">
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl">
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl mb-4">
-                    <span className="text-2xl">🎯</span>
+            <div className="max-w-7xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-16 border border-white/30 shadow-2xl">
+                <div className="text-center mb-12">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-3xl mb-6 shadow-2xl">
+                    <span className="text-3xl">🎯</span>
                   </div>
-                  <h2 className="text-3xl font-bold text-white mb-2">Choose Your Health Goals</h2>
-                  <p className="text-gray-300">Select up to 3 goals that excite you most (tap to select/deselect)</p>
+                  <h2 className="text-4xl font-bold text-white mb-4">Choose Your Health Goals</h2>
+                  <p className="text-gray-300 text-lg">Select up to 3 goals that excite you most (tap to select/deselect)</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                   {predefinedGoals.map((goal, index) => {
                     const isSelected = selectedGoals.includes(goal.id);
                     const priority = selectedGoals.indexOf(goal.id) + 1;
@@ -531,21 +537,21 @@ export default function DiscoveryPage() {
                         key={goal.id}
                         onClick={() => handleGoalSelection(goal.id)}
                         disabled={!isSelected && selectedGoals.length >= 3}
-                        className={`relative p-6 rounded-2xl border transition-all duration-500 transform hover:scale-105 ${
+                        className={`relative p-8 rounded-3xl border-2 transition-all duration-500 transform hover:scale-105 ${
                           isSelected
-                            ? `bg-gradient-to-r ${goal.color} border-white/50 text-white shadow-2xl scale-105`
-                            : 'bg-white/10 border-white/20 text-gray-300 hover:bg-white/20 hover:border-white/40'
+                            ? `${goal.gradient} border-white/50 text-white shadow-2xl scale-105`
+                            : 'bg-white/10 border-white/30 text-gray-300 hover:bg-white/20 hover:border-white/50'
                         } ${!isSelected && selectedGoals.length >= 3 ? 'opacity-50 cursor-not-allowed' : ''} group`}
                         style={{
                           animationDelay: `${index * 100}ms`
                         }}
                       >
                         {isSelected && (
-                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-white text-black rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                          <div className="absolute -top-3 -right-3 w-10 h-10 bg-white text-black rounded-full flex items-center justify-center font-bold text-lg shadow-2xl">
                             {priority}
                           </div>
                         )}
-                        <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
                           {goal.icon}
                         </div>
                         <div className="font-semibold text-lg leading-tight">
@@ -557,14 +563,14 @@ export default function DiscoveryPage() {
                 </div>
 
                 {selectedGoals.length > 0 && (
-                  <div className="mb-8">
-                    <h3 className="text-white font-semibold mb-4">Selected Goals Priority:</h3>
-                    <div className="flex flex-wrap gap-3">
+                  <div className="mb-12">
+                    <h3 className="text-white font-bold mb-6 text-xl">Selected Goals Priority:</h3>
+                    <div className="flex flex-wrap gap-4">
                       {selectedGoals.map((goalId, index) => {
                         const goal = predefinedGoals.find(g => g.id === goalId);
                         return (
-                          <div key={goalId} className={`flex items-center px-4 py-2 rounded-full bg-gradient-to-r ${goal?.color} text-white text-sm font-medium`}>
-                            <span className="mr-2 bg-white text-black rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                          <div key={goalId} className={`flex items-center px-6 py-3 rounded-full ${goal?.gradient} text-white font-medium shadow-2xl`}>
+                            <span className="mr-3 bg-white text-black rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                               {index + 1}
                             </span>
                             {goal?.label}
@@ -575,17 +581,17 @@ export default function DiscoveryPage() {
                   </div>
                 )}
 
-                <div className="flex space-x-4">
+                <div className="flex space-x-6">
                   <button
                     onClick={prevSection}
-                    className="flex-1 py-4 bg-white/10 border border-white/20 text-white font-medium rounded-2xl hover:bg-white/20 transition-all duration-300"
+                    className="flex-1 py-6 bg-white/10 border-2 border-white/30 text-white font-semibold text-lg rounded-2xl hover:bg-white/20 transition-all duration-300"
                   >
                     ← Back
                   </button>
                   <button
                     onClick={nextSection}
                     disabled={selectedGoals.length === 0}
-                    className="flex-1 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold text-lg rounded-2xl hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 shadow-2xl"
+                    className="flex-1 py-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold text-xl rounded-2xl hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 shadow-2xl"
                   >
                     Continue to Assessment 📊
                   </button>
@@ -596,48 +602,48 @@ export default function DiscoveryPage() {
 
           {/* Part 3: Wellness Indicators */}
           {currentSection === 3 && (
-            <div className="max-w-6xl mx-auto">
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl">
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-violet-500 to-pink-500 rounded-2xl mb-4">
-                    <span className="text-2xl">📊</span>
+            <div className="max-w-7xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-16 border border-white/30 shadow-2xl">
+                <div className="text-center mb-12">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-violet-500 to-pink-500 rounded-3xl mb-6 shadow-2xl">
+                    <span className="text-3xl">📊</span>
                   </div>
-                  <h2 className="text-3xl font-bold text-white mb-2">Your Wellness Baseline</h2>
-                  <p className="text-gray-300">Rate how you feel right now (0-100). This becomes your starting point for tracking progress!</p>
+                  <h2 className="text-4xl font-bold text-white mb-4">Your Wellness Baseline</h2>
+                  <p className="text-gray-300 text-lg">Rate how you feel right now (0-100). This becomes your starting point for tracking progress!</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {[
-                    { key: 'fulfillment', label: 'Life Fulfillment', icon: '✨', question: 'How fulfilled do you feel in life?', color: 'from-purple-500 to-pink-500' },
-                    { key: 'happiness', label: 'Overall Happiness', icon: '😊', question: 'How happy do you feel overall?', color: 'from-yellow-500 to-orange-500' },
-                    { key: 'energy', label: 'Daily Energy', icon: '⚡', question: 'How energetic are you most days?', color: 'from-blue-500 to-cyan-500' },
-                    { key: 'stress', label: 'Stress Management', icon: '🧘', question: 'How well do you manage stress?', color: 'from-green-500 to-emerald-500' },
-                    { key: 'sleep', label: 'Sleep Quality', icon: '😴', question: 'How well are you sleeping?', color: 'from-indigo-500 to-purple-500' },
-                    { key: 'activity', label: 'Physical Activity', icon: '🏃', question: 'How active are you weekly?', color: 'from-red-500 to-pink-500' },
-                    { key: 'nutrition', label: 'Nutrition Quality', icon: '🥗', question: 'How healthy is your diet?', color: 'from-lime-500 to-green-500' },
-                    { key: 'purpose', label: 'Life Purpose', icon: '🎯', question: 'How clear is your life\'s purpose?', color: 'from-violet-500 to-purple-500' },
-                    { key: 'motivation', label: 'Motivation to Change', icon: '🚀', question: 'How motivated are you to improve?', color: 'from-orange-500 to-red-500' },
-                    { key: 'confidence', label: 'Confidence in Change', icon: '💪', question: 'How confident are you in creating your future self?', color: 'from-teal-500 to-cyan-500' }
+                    { key: 'fulfillment', label: 'Life Fulfillment', icon: '✨', question: 'How fulfilled do you feel in life?', gradient: 'from-purple-500 to-pink-500' },
+                    { key: 'happiness', label: 'Overall Happiness', icon: '😊', question: 'How happy do you feel overall?', gradient: 'from-yellow-500 to-orange-500' },
+                    { key: 'energy', label: 'Daily Energy', icon: '⚡', question: 'How energetic are you most days?', gradient: 'from-blue-500 to-cyan-500' },
+                    { key: 'stress', label: 'Stress Management', icon: '🧘', question: 'How well do you manage stress?', gradient: 'from-green-500 to-emerald-500' },
+                    { key: 'sleep', label: 'Sleep Quality', icon: '😴', question: 'How well are you sleeping?', gradient: 'from-indigo-500 to-purple-500' },
+                    { key: 'activity', label: 'Physical Activity', icon: '🏃', question: 'How active are you weekly?', gradient: 'from-red-500 to-pink-500' },
+                    { key: 'nutrition', label: 'Nutrition Quality', icon: '🥗', question: 'How healthy is your diet?', gradient: 'from-lime-500 to-green-500' },
+                    { key: 'purpose', label: 'Life Purpose', icon: '🎯', question: 'How clear is your life\'s purpose?', gradient: 'from-violet-500 to-purple-500' },
+                    { key: 'motivation', label: 'Motivation to Change', icon: '🚀', question: 'How motivated are you to improve?', gradient: 'from-orange-500 to-red-500' },
+                    { key: 'confidence', label: 'Confidence in Change', icon: '💪', question: 'How confident are you in creating your future self?', gradient: 'from-teal-500 to-cyan-500' }
                   ].map((indicator, index) => (
                     <div 
                       key={indicator.key} 
-                      className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300"
+                      className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/20 hover:bg-white/10 transition-all duration-300 shadow-2xl"
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
-                      <div className="flex items-center mb-4">
-                        <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${indicator.color} flex items-center justify-center text-xl mr-4`}>
+                      <div className="flex items-center mb-6">
+                        <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${indicator.gradient} flex items-center justify-center text-2xl mr-6 shadow-2xl`}>
                           {indicator.icon}
                         </div>
                         <div>
-                          <h3 className="text-white font-semibold text-lg">{indicator.label}</h3>
+                          <h3 className="text-white font-bold text-xl">{indicator.label}</h3>
                           <p className="text-gray-400 text-sm">{indicator.question}</p>
                         </div>
                       </div>
                       
-                      <div className="mb-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-400 text-sm">Current Level</span>
-                          <span className={`text-2xl font-bold bg-gradient-to-r ${indicator.color} bg-clip-text text-transparent`}>
+                      <div className="mb-6">
+                        <div className="flex justify-between items-center mb-4">
+                          <span className="text-gray-400 font-medium">Current Level</span>
+                          <span className={`text-3xl font-bold bg-gradient-to-r ${indicator.gradient} bg-clip-text text-transparent`}>
                             {indicators[indicator.key as keyof typeof indicators]}
                           </span>
                         </div>
@@ -647,7 +653,10 @@ export default function DiscoveryPage() {
                           max="100"
                           value={indicators[indicator.key as keyof typeof indicators]}
                           onChange={(e) => updateIndicator(indicator.key, parseInt(e.target.value))}
-                          className="w-full h-3 bg-white/20 rounded-full appearance-none cursor-pointer slider-thumb"
+                          className="w-full h-4 bg-gray-700 rounded-full appearance-none cursor-pointer slider-thumb"
+                          style={{
+                            background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(147, 51, 234) ${indicators[indicator.key as keyof typeof indicators]}%, rgb(55, 65, 81) ${indicators[indicator.key as keyof typeof indicators]}%, rgb(55, 65, 81) 100%)`
+                          }}
                         />
                         <div className="flex justify-between text-xs text-gray-500 mt-2">
                           <span>0 (Lowest)</span>
@@ -655,9 +664,9 @@ export default function DiscoveryPage() {
                         </div>
                       </div>
                       
-                      <div className={`h-2 rounded-full bg-gradient-to-r ${indicator.color} opacity-30 relative overflow-hidden`}>
+                      <div className={`h-3 rounded-full bg-gradient-to-r ${indicator.gradient} opacity-20 relative overflow-hidden`}>
                         <div 
-                          className={`h-full bg-gradient-to-r ${indicator.color} transition-all duration-500 ease-out`}
+                          className={`h-full bg-gradient-to-r ${indicator.gradient} transition-all duration-500 ease-out shadow-lg`}
                           style={{ width: `${indicators[indicator.key as keyof typeof indicators]}%` }}
                         />
                       </div>
@@ -665,21 +674,21 @@ export default function DiscoveryPage() {
                   ))}
                 </div>
 
-                <div className="flex space-x-4 mt-12">
+                <div className="flex space-x-6 mt-16">
                   <button
                     onClick={prevSection}
-                    className="flex-1 py-4 bg-white/10 border border-white/20 text-white font-medium rounded-2xl hover:bg-white/20 transition-all duration-300"
+                    className="flex-1 py-6 bg-white/10 border-2 border-white/30 text-white font-semibold text-lg rounded-2xl hover:bg-white/20 transition-all duration-300"
                   >
                     ← Back
                   </button>
                   <button
                     onClick={handleSubmit}
                     disabled={loading || !isFormValid()}
-                    className="flex-1 py-4 bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold text-lg rounded-2xl hover:from-pink-600 hover:to-violet-600 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 shadow-2xl relative overflow-hidden group"
+                    className="flex-1 py-6 bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold text-xl rounded-2xl hover:from-pink-600 hover:to-violet-600 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 shadow-2xl relative overflow-hidden group"
                   >
                     {loading ? (
                       <div className="flex items-center justify-center">
-                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mr-4"></div>
                         Creating Your Experience...
                       </div>
                     ) : (
@@ -696,53 +705,33 @@ export default function DiscoveryPage() {
         </div>
       </div>
 
-      {/* Custom Styles */}
       <style jsx>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        
         .slider-thumb::-webkit-slider-thumb {
           appearance: none;
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           background: linear-gradient(45deg, #06b6d4, #8b5cf6);
           cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          border: 3px solid white;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
           transition: all 0.3s ease;
         }
         
         .slider-thumb::-webkit-slider-thumb:hover {
-          transform: scale(1.2);
-          box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+          transform: scale(1.3);
+          box-shadow: 0 12px 24px rgba(139, 92, 246, 0.6);
         }
         
         .slider-thumb::-moz-range-thumb {
           appearance: none;
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           background: linear-gradient(45deg, #06b6d4, #8b5cf6);
           cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          border: 3px solid white;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
         
         input[type="range"] {
@@ -753,48 +742,39 @@ export default function DiscoveryPage() {
         }
         
         input[type="range"]::-webkit-slider-track {
-          background: rgba(255, 255, 255, 0.2);
-          height: 12px;
-          border-radius: 6px;
+          background: transparent;
+          height: 16px;
+          border-radius: 8px;
         }
         
         input[type="range"]::-moz-range-track {
-          background: rgba(255, 255, 255, 0.2);
-          height: 12px;
-          border-radius: 6px;
+          background: transparent;
+          height: 16px;
+          border-radius: 8px;
           border: none;
         }
         
-        .group:hover .group-hover\\:scale-x-100 {
-          transform: scaleX(1);
+        .animation-delay-2000 {
+          animation-delay: 2s;
         }
         
-        /* Responsive animations */
-        @media (prefers-reduced-motion: reduce) {
-          .animate-blob,
-          .animate-ping,
-          .animate-spin {
-            animation: none;
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
         
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(45deg, #06b6d4, #8b5cf6);
-          border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(45deg, #0891b2, #7c3aed);
+        .animate-fadeInUp {
+          animation: fadeInUp 0.6s ease-out;
         }
       `}</style>
     </div>
