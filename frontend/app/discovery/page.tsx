@@ -1,4 +1,4 @@
-// frontend/app/discovery/page.tsx - COMPLETE VERSION
+// frontend/app/discovery/page.tsx - ESLINT FIXED VERSION
 "use client";
 
 import { useState } from "react";
@@ -161,8 +161,8 @@ export default function DiscoveryPage() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-blue-600 mb-2">Welcome to Your Health Journey!</h1>
         <p className="text-gray-600 leading-relaxed">
-          We're excited you're here. Before we get started, we'd like to learn a bit about you. 
-          Your honest answers will help us tailor our coaching and ensure you get the support you need. Let's begin!
+          We&rsquo;re excited you&rsquo;re here. Before we get started, we&rsquo;d like to learn a bit about you. 
+          Your honest answers will help us tailor our coaching and ensure you get the support you need. Let&rsquo;s begin!
         </p>
       </div>
 
@@ -238,7 +238,7 @@ export default function DiscoveryPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Height: {heightFeet}' {heightInches}" *
+                Height: {heightFeet}&apos; {heightInches}&quot; *
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -252,8 +252,8 @@ export default function DiscoveryPage() {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>3'</span>
-                    <span>7'</span>
+                    <span>3&apos;</span>
+                    <span>7&apos;</span>
                   </div>
                 </div>
                 <div>
@@ -267,8 +267,8 @@ export default function DiscoveryPage() {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>0"</span>
-                    <span>11"</span>
+                    <span>0&quot;</span>
+                    <span>11&quot;</span>
                   </div>
                 </div>
               </div>
@@ -336,7 +336,7 @@ export default function DiscoveryPage() {
         <section className="space-y-6">
           <h2 className="text-2xl font-semibold text-center mb-6">Part 2: Top Three Health Goals</h2>
           <p className="text-center text-gray-600 mb-6">
-            Select and rank your top three health goals (1, 2, 3). You can also write in your own if it's not listed.
+            Select and rank your top three health goals (1, 2, 3). You can also write in your own if it&rsquo;s not listed.
           </p>
 
           <div className="space-y-6">
@@ -437,7 +437,7 @@ export default function DiscoveryPage() {
       {/* Part 3: Wellness & Purpose Indicators */}
       {currentSection === 3 && (
         <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center mb-6">Part 3: Wellness & Purpose</h2>
+          <h2 className="text-2xl font-semibold text-center mb-6">Part 3: Wellness &amp; Purpose</h2>
           <p className="text-center text-gray-600 mb-6">
             Rate how you feel right now on a scale from 0 (lowest) to 100 (highest).
           </p>
@@ -449,7 +449,7 @@ export default function DiscoveryPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Fulfillment: {fulfillment} - "How fulfilled do you feel in life?"
+                    Fulfillment: {fulfillment} - &ldquo;How fulfilled do you feel in life?&rdquo;
                   </label>
                   <input
                     type="range"
@@ -463,7 +463,7 @@ export default function DiscoveryPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Happiness: {happiness} - "How happy do you feel overall?"
+                    Happiness: {happiness} - &ldquo;How happy do you feel overall?&rdquo;
                   </label>
                   <input
                     type="range"
@@ -477,7 +477,7 @@ export default function DiscoveryPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Energy: {energy} - "How energetic are you on most days?"
+                    Energy: {energy} - &ldquo;How energetic are you on most days?&rdquo;
                   </label>
                   <input
                     type="range"
@@ -491,7 +491,7 @@ export default function DiscoveryPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Stress Management: {stress} - "How well do you manage stress?" (higher = better)
+                    Stress Management: {stress} - &ldquo;How well do you manage stress?&rdquo; (higher = better)
                   </label>
                   <input
                     type="range"
@@ -505,7 +505,7 @@ export default function DiscoveryPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Sleep Quality: {sleep} - "How well are you sleeping?"
+                    Sleep Quality: {sleep} - &ldquo;How well are you sleeping?&rdquo;
                   </label>
                   <input
                     type="range"
@@ -519,7 +519,7 @@ export default function DiscoveryPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Physical Activity: {activity} - "How active are you weekly?"
+                    Physical Activity: {activity} - &ldquo;How active are you weekly?&rdquo;
                   </label>
                   <input
                     type="range"
@@ -533,7 +533,7 @@ export default function DiscoveryPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Nutrition Quality: {nutrition} - "How healthy is your diet?"
+                    Nutrition Quality: {nutrition} - &ldquo;How healthy is your diet?&rdquo;
                   </label>
                   <input
                     type="range"
@@ -553,7 +553,7 @@ export default function DiscoveryPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Sense of Purpose: {purpose} - "How clear is your life's purpose?"
+                    Sense of Purpose: {purpose} - &ldquo;How clear is your life&rsquo;s purpose?&rdquo;
                   </label>
                   <input
                     type="range"
@@ -567,7 +567,7 @@ export default function DiscoveryPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Motivation to Change: {motivation} - "How motivated are you to make positive changes?"
+                    Motivation to Change: {motivation} - &ldquo;How motivated are you to make positive changes?&rdquo;
                   </label>
                   <input
                     type="range"
@@ -581,7 +581,7 @@ export default function DiscoveryPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Confidence in Change: {confidence} - "How confident are you that you can create the future-self you desire?"
+                    Confidence in Change: {confidence} - &ldquo;How confident are you that you can create the future-self you desire?&rdquo;
                   </label>
                   <input
                     type="range"
