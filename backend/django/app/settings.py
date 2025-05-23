@@ -249,14 +249,19 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     
-    # SSL/TLS settings
-    SECURE_SSL_REDIRECT = True
+    # 🔥 FIXED: SSL/TLS settings for Azure App Service
+    # Don't force SSL redirect - Azure handles this at the load balancer level
+    # SECURE_SSL_REDIRECT = True  # Commented out - causes infinite redirects on Azure
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     
     # Additional security headers
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
     SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+    
+    # 🔥 Azure App Service specific settings
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_TZ = True
 
 # 🎯 Rate limiting (optional but recommended for token endpoints)
 # You can add django-ratelimit if needed for additional security
