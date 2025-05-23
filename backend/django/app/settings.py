@@ -1,6 +1,7 @@
 """
 Django settings for app project.
 Production-ready and Azure-compatible with decouple support.
+Enhanced with JWT token refresh and security features.
 """
 
 from decouple import config
@@ -27,6 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",  # 🔥 NEW: Token blacklisting for security
     "users",
     'consent',
     'discovery',
@@ -87,7 +89,7 @@ DATABASES = {
         "NAME": config("POSTGRES_DB", default="flexibleserverdb"),
         "USER": config("POSTGRES_USER", default="vitaladmin"),
         "PASSWORD": config("POSTGRES_PASSWORD", default=""),
-        "HOST": config("POSTGRES_HOST", default="vitalpath-db-psql.postgres.database.azure.com"),
+        "HOST": config("POSTGRES_HOST", default="vitalpath-db.postgres.database.azure.com"),  # 🔥 FIXED: Corrected hostname
         "PORT": config("POSTGRES_PORT", default="5432"),
         "OPTIONS": {
             "sslmode": "require",
@@ -145,7 +147,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # DEFAULT PRIMARY KEY
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# JWT Authentication (SimpleJWT)
+# 🔥 ENHANCED JWT Authentication with Token Refresh Magic
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -154,18 +156,56 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True,
+    # 🕐 Token lifetimes - Optimized for security and UX
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),  # Short-lived for security
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),     # Longer-lived for convenience
+    
+    # 🔄 Token rotation and security
+    "ROTATE_REFRESH_TOKENS": True,                   # Generate new refresh token on refresh
+    "BLACKLIST_AFTER_ROTATION": True,               # Blacklist old refresh tokens for security
+    "UPDATE_LAST_LOGIN": True,                       # Update user's last_login on token refresh
+    
+    # 🔐 Token configuration
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    
+    # 📋 Token headers and claims
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    
+    # 🎫 Token types and claims
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+    "JTI_CLAIM": "jti",
+    
+    # 🔄 Sliding tokens (keeps tokens fresh automatically)
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=15),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    
+    # 🛡️ Additional security settings
+    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
 }
 
-# LOGGING
+# LOGGING with enhanced JWT debugging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
             'style': '{',
         },
     },
@@ -190,11 +230,51 @@ LOGGING = {
             'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': False,
         },
+        # 🔍 JWT-specific logging for debugging token issues
+        'rest_framework_simplejwt': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
     },
 }
 
-# Security settings for production
+# 🛡️ Enhanced Security settings for production
 if not DEBUG:
+    # Security headers
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # SSL/TLS settings
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # Additional security headers
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+# 🎯 Rate limiting (optional but recommended for token endpoints)
+# You can add django-ratelimit if needed for additional security
+
+# 📊 Performance monitoring (optional)
+# Add APM/monitoring configuration here if using services like Sentry
+
+# 🔄 Cache configuration (optional for better performance)
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': 'redis://127.0.0.1:6379/1',
+#     }
+# }
+
+print("🚀 VitalPath Django settings loaded successfully!")
+print(f"🔐 JWT Access Token Lifetime: {SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']}")
+print(f"🔄 JWT Refresh Token Lifetime: {SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']}")
+print(f"🛡️ Token Rotation Enabled: {SIMPLE_JWT['ROTATE_REFRESH_TOKENS']}")
+if DEBUG:
+    print("⚠️  DEBUG MODE ENABLED - Use production settings for deployment!")
